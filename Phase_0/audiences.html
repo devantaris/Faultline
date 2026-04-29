@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Faultline — For Every Audience</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#04060f;--card:#0f1729;--border:#1e293b;--accent:#6366f1;--accent2:#a855f7;--accent3:#06b6d4;--red:#ef4444;--green:#22c55e;--yellow:#f59e0b;--orange:#f97316;--text:#f1f5f9;--muted:#94a3b8}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+
+.hero{padding:70px 60px 50px;text-align:center;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(99,102,241,.1),transparent)}
+.hero h1{font-size:3rem;font-weight:900;letter-spacing:-.03em;background:linear-gradient(135deg,#6366f1,#a855f7,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:640px;margin:0 auto}
+.hero-tag{display:inline-block;padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3)}
+
+.main{max-width:1000px;margin:0 auto;padding:60px 40px}
+
+/* AUDIENCE TABS */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px;background:var(--card);padding:8px;border-radius:14px;border:1px solid var(--border)}
+.tab{flex:1;min-width:140px;padding:12px 16px;border-radius:10px;border:none;background:none;cursor:pointer;transition:all .3s;text-align:center;color:var(--muted);font-family:'Inter',sans-serif;font-size:.85rem;font-weight:600}
+.tab .tab-icon{font-size:1.3rem;display:block;margin-bottom:4px}
+.tab.active{color:var(--text);font-weight:700}
+.tab.a1.active{background:rgba(99,102,241,.2);color:var(--accent)}
+.tab.a2.active{background:rgba(6,182,212,.2);color:var(--accent3)}
+.tab.a3.active{background:rgba(168,85,247,.2);color:var(--accent2)}
+.tab.a4.active{background:rgba(245,158,11,.2);color:var(--yellow)}
+.tab.a5.active{background:rgba(34,197,94,.2);color:var(--green)}
+
+/* PANELS */
+.panel{display:none}
+.panel.active{display:block}
+
+/* AUDIENCE CARD */
+.aud-header{display:flex;align-items:center;gap:20px;margin-bottom:32px;padding:28px;background:var(--card);border-radius:16px;border:1px solid var(--border)}
+.aud-avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;border:2px solid;flex-shrink:0}
+.a1 .aud-avatar{border-color:var(--accent);background:rgba(99,102,241,.1)}
+.a2 .aud-avatar{border-color:var(--accent3);background:rgba(6,182,212,.1)}
+.a3 .aud-avatar{border-color:var(--accent2);background:rgba(168,85,247,.1)}
+.a4 .aud-avatar{border-color:var(--yellow);background:rgba(245,158,11,.1)}
+.a5 .aud-avatar{border-color:var(--green);background:rgba(34,197,94,.1)}
+.aud-meta h2{font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.aud-meta .subtitle{font-size:.85rem;color:var(--muted)}
+.aud-meta .context{margin-top:8px;padding:6px 12px;border-radius:6px;font-size:.78rem;font-weight:600;font-family:'JetBrains Mono',monospace;display:inline-block}
+.a1-ctx{background:rgba(99,102,241,.12);color:var(--accent)}
+.a2-ctx{background:rgba(6,182,212,.12);color:var(--accent3)}
+.a3-ctx{background:rgba(168,85,247,.12);color:var(--accent2)}
+.a4-ctx{background:rgba(245,158,11,.12);color:var(--yellow)}
+.a5-ctx{background:rgba(34,197,94,.12);color:var(--green)}
+
+.explain-block{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px}
+.explain-block h3{font-size:1rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.explain-block p{color:var(--muted);font-size:.9rem;line-height:1.75}
+.explain-block p strong{color:var(--text)}
+.analogy{border-left:3px solid var(--accent);padding:16px 20px;background:rgba(99,102,241,.06);border-radius:0 10px 10px 0;margin:16px 0;font-size:.9rem;color:var(--muted);font-style:italic;line-height:1.7}
+.analogy strong{color:var(--text);font-style:normal}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.mini-card{background:#0b0f1e;border:1px solid var(--border);border-radius:10px;padding:16px}
+.mini-card h4{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.mini-card p{font-size:.8rem;line-height:1.6;margin:0}
+.hook{margin-top:20px;padding:20px 24px;border-radius:12px;font-size:.95rem;line-height:1.7}
+.hook.a1{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:var(--text)}
+.hook.a2{background:rgba(6,182,212,.08);border:1px solid rgba(6,182,212,.2);color:var(--text)}
+.hook.a3{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);color:var(--text)}
+.hook.a4{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--text)}
+.hook.a5{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);color:var(--text)}
+.hook-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;color:var(--muted)}
+code{font-family:'JetBrains Mono',monospace;font-size:.82rem;background:rgba(255,255,255,.06);padding:2px 6px;border-radius:4px;color:var(--accent3)}
+ul{color:var(--muted);padding-left:20px}
+ul li{margin-bottom:8px;font-size:.9rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">5 Audiences · 1 Project</div>
+  <h1>Faultline, Explained to Everyone</h1>
+  <p>The same project, explained five completely different ways — because how you pitch it depends entirely on who's listening.</p>
+</div>
+
+<div class="main">
+
+<div class="tabs">
+  <button class="tab a1 active" onclick="show('p1',this)"><span class="tab-icon">🧔</span>The Layman</button>
+  <button class="tab a2" onclick="show('p2',this)"><span class="tab-icon">🎓</span>College Professor</button>
+  <button class="tab a3" onclick="show('p3',this)"><span class="tab-icon">🔬</span>Researcher</button>
+  <button class="tab a4" onclick="show('p4',this)"><span class="tab-icon">🏆</span>Hackathon Judge</button>
+  <button class="tab a5" onclick="show('p5',this)"><span class="tab-icon">🧑‍💻</span>Fellow Student</button>
+</div>
+
+<!-- PANEL 1: LAYMAN -->
+<div class="panel active a1" id="p1">
+  <div class="aud-header a1">
+    <div class="aud-avatar">🧔</div>
+    <div class="aud-meta">
+      <h2>The Layman</h2>
+      <div class="subtitle">Doesn't know what a microservice is. Thinks servers are just computers somewhere.</div>
+      <div class="context a1-ctx">Goal: make them go "oh wow, that's actually clever"</div>
+    </div>
+  </div>
+
+  <div class="explain-block">
+    <h3>🌍 The Big Picture</h3>
+    <p>You know how when WhatsApp is down, suddenly you can't use other apps that rely on it? Or when Amazon's payment page crashes during a sale, the whole checkout breaks? That's called a <strong>cascading failure</strong> — one thing breaks, and it takes down everything connected to it.</p>
+    <p style="margin-top:12px">Big companies have hundreds of little programs (called services) running simultaneously — one handles your login, one handles payments, one handles notifications, one handles your order history. They all talk to each other. When one dies, the others panic.</p>
+    <div class="analogy">"Imagine a restaurant where the chef, cashier, and delivery guy all depend on each other. If the cashier goes home sick, the chef stops cooking, and the delivery guy sits idle. The whole restaurant breaks — because of one person." That's a cascading failure.</div>
+    <p>My project, Faultline, lets engineers <strong>test this before it happens in real life</strong>. You draw your services like boxes on a whiteboard, connect them with arrows, then click a button that says "crash this one." The tool shows you exactly which other boxes break, in what order, and how bad it gets. Then an AI writes a plain-English report telling you what to fix.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3>🤔 Why does this matter?</h3>
+    <div class="grid-2">
+      <div class="mini-card"><h4>Without Faultline</h4><p style="color:var(--muted);font-size:.8rem">Engineers find out what breaks when it breaks — in production, affecting real users, costing real money.</p></div>
+      <div class="mini-card"><h4>With Faultline</h4><p style="color:var(--muted);font-size:.8rem">Engineers test failures safely beforehand. Fix weak points. Build confidence before launch.</p></div>
+    </div>
+  </div>
+
+  <div class="hook a1">
+    <div class="hook-label">The One-Liner For Your Parents</div>
+    "You know how Netflix never goes down? Companies like that spend millions testing what happens when things break. I built a free tool that does the same thing — visually, in your browser."
+  </div>
+</div>
+
+<!-- PANEL 2: PROFESSOR -->
+<div class="panel a2" id="p2">
+  <div class="aud-header a2">
+    <div class="aud-avatar">🎓</div>
+    <div class="aud-meta">
+      <h2>College Professor</h2>
+      <div class="subtitle">Understands CS theory deeply. Cares about correctness, rigor, and educational value.</div>
+      <div class="context a2-ctx">Goal: demonstrate conceptual depth and academic grounding</div>
+    </div>
+  </div>
+
+  <div class="explain-block">
+    <h3>📐 The Formal Problem</h3>
+    <p>Faultline addresses the fault propagation problem in directed acyclic service dependency graphs. Given a graph <code>G = (V, E)</code> where vertices represent microservices and directed edges represent synchronous call dependencies, the system models how a localized fault at node <code>v₀</code> propagates through the graph based on configurable per-node resilience parameters.</p>
+    <p style="margin-top:12px">The propagation algorithm performs a modified BFS traversal in reverse-dependency order — evaluating for each caller whether its effective latency budget is exceeded by the sum of base latency, failure-induced delay, and retry amplification. Nodes that exceed their timeout trigger state transitions in dependent nodes, creating a deterministic failure chain.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3>📚 Concepts Implemented</h3>
+    <ul>
+      <li><strong>Circuit Breaker Pattern</strong> — 3-state FSM (CLOSED/OPEN/HALF-OPEN) with configurable failure threshold, recovery timeout, and probe logic. Based on Michael Nygard's Release It! and Netflix's Hystrix implementation.</li>
+      <li><strong>Retry Storm Modelling</strong> — Amplification factor computed as <code>retry_count × concurrent_callers</code>. Models the non-obvious failure mode where latency-induced retries cause overload faultlines.</li>
+      <li><strong>Timeout Budget Inheritance</strong> — Each service has a timeout budget. Effective response time = baseline + failure penalty. If budget exceeded, caller fails — propagating upward.</li>
+      <li><strong>Stochastic Packet Loss</strong> — Probabilistic Bernoulli trial per request at configurable drop rate. Retries interact with timeout budget to determine failure threshold.</li>
+      <li><strong>LLM Structured Output</strong> — Gemini function-calling (not free text) maps simulation telemetry to typed incident report schema. Avoids hallucination by grounding in real simulation data.</li>
+    </ul>
+  </div>
+
+  <div class="hook a2">
+    <div class="hook-label">The Academic Pitch</div>
+    "This is an implementation of distributed systems failure theory — specifically graph-based fault propagation with configurable resilience primitives. It makes abstract concepts from CAP theorem, circuit breakers, and retry mechanics directly observable and interactive. It functions as both a tool and a teaching instrument."
+  </div>
+</div>
+
+<!-- PANEL 3: RESEARCHER -->
+<div class="panel a3" id="p3">
+  <div class="aud-header a3">
+    <div class="aud-avatar">🔬</div>
+    <div class="aud-meta">
+      <h2>Researcher</h2>
+      <div class="subtitle">Cares about novelty, methodology, limitations, and open problems.</div>
+      <div class="context a3-ctx">Goal: honest framing of what this does and doesn't claim</div>
+    </div>
+  </div>
+
+  <div class="explain-block">
+    <h3>🧪 What This Is (and Isn't)</h3>
+    <p>Faultline is a <strong>deterministic simulation model</strong> for failure propagation in microservice dependency graphs. It is not a live chaos engineering tool (that would require actual service injection, like Gremlin or Chaos Monkey). It is a configurable model that lets engineers reason about failure blast radius before deployment.</p>
+    <p style="margin-top:12px">The simulation engine uses a graph-traversal approach with parameterized resilience primitives per node. The failure physics are approximations — the retry storm amplification model assumes uniform concurrency, which is unrealistic in production. The circuit breaker FSM uses a simplified rolling-window failure counter rather than a leaky-bucket or token-bucket rate limiter.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3>🔍 Honest Limitations</h3>
+    <ul>
+      <li>Assumes static topology — no dynamic service discovery or autoscaling modelled</li>
+      <li>Retry storm amplification is a linear model; real production exhibits non-linear feedback loops</li>
+      <li>No partial failure states — nodes are binary (alive/dead) with a degraded intermediate</li>
+      <li>LLM report generation is bounded by simulation output quality; garbage in, garbage out</li>
+      <li>No temporal correlation of failures — multi-site, simultaneous failure injection not supported</li>
+    </ul>
+  </div>
+
+  <div class="explain-block">
+    <h3>🚀 Open Research Directions</h3>
+    <ul>
+      <li>Probabilistic fault tree analysis integration for quantitative reliability scoring</li>
+      <li>Monte Carlo simulation across failure scenarios to compute expected blast radius distributions</li>
+      <li>Comparison against production incident data to validate simulation accuracy</li>
+      <li>Integration with OpenTelemetry traces to learn real-world latency distributions per edge</li>
+    </ul>
+  </div>
+
+  <div class="hook a3">
+    <div class="hook-label">Researcher Framing</div>
+    "Faultline is a configurable failure propagation simulator for directed service dependency graphs. It provides a deterministic model for reasoning about fault blast radius using circuit breaker FSMs and retry amplification heuristics — with known simplifications that represent tractable areas for future rigour."
+  </div>
+</div>
+
+<!-- PANEL 4: HACKATHON JUDGE -->
+<div class="panel a4" id="p4">
+  <div class="aud-header a4">
+    <div class="aud-avatar">🏆</div>
+    <div class="aud-meta">
+      <h2>Hackathon Judge</h2>
+      <div class="subtitle">Has 3 minutes per project. Needs to see: novelty, execution, demo, real-world relevance.</div>
+      <div class="context a4-ctx">Goal: win in under 90 seconds</div>
+    </div>
+  </div>
+
+  <div class="explain-block">
+    <h3>⚡ The 30-Second Version</h3>
+    <p><strong>Problem:</strong> Companies discover what breaks only when it breaks — in production, at 3am, affecting millions of users. There's no safe way to test cascading failures without a full Kubernetes cluster and a $thousands/mo chaos engineering tool.</p>
+    <p style="margin-top:12px"><strong>Solution:</strong> Faultline. Draw your architecture in the browser. Click a service. Inject a failure. Watch the faultline animate in real-time across your graph. Get an AI-generated blast radius report. All in 60 seconds, no infrastructure required.</p>
+    <p style="margin-top:12px"><strong>Demo moment:</strong> Load the e-commerce preset → inject payment API crash → circuit breaker at auth trips → orders faultline in 4.2s → Gemini report says "68% of users affected, recovery ~8 minutes." Done.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3>🎯 Why This Wins</h3>
+    <div class="grid-2">
+      <div class="mini-card"><h4>✅ Novel</h4><p style="color:var(--muted);font-size:.8rem">No open-source visual chaos simulator exists. Gremlin costs $$$. This is free, instant, browser-based.</p></div>
+      <div class="mini-card"><h4>✅ Real Problem</h4><p style="color:var(--muted);font-size:.8rem">Every company running microservices needs this. Paytm, Zomato, Razorpay — their SRE teams care about this.</p></div>
+      <div class="mini-card"><h4>✅ Strong Demo</h4><p style="color:var(--muted);font-size:.8rem">Visual, interactive, animated. Recruiter or judge understands the value in under 30 seconds.</p></div>
+      <div class="mini-card"><h4>✅ Technical Depth</h4><p style="color:var(--muted);font-size:.8rem">BFS propagation, circuit breaker FSM, Gemini tool-calling — real engineering, not a CRUD wrapper.</p></div>
+    </div>
+  </div>
+
+  <div class="hook a4">
+    <div class="hook-label">The Pitch Line</div>
+    "Faultline is a visual chaos engineering simulator — you draw your microservices, inject failures, and get an AI-generated blast radius report. Think Figma meets Gremlin, but free and in the browser. We built it in 30 days."
+  </div>
+</div>
+
+<!-- PANEL 5: FELLOW STUDENT -->
+<div class="panel a5" id="p5">
+  <div class="aud-header a5">
+    <div class="aud-avatar">🧑‍💻</div>
+    <div class="aud-meta">
+      <h2>Fellow Student</h2>
+      <div class="subtitle">Knows React and basic backend. Curious about the tech choices and what you actually built.</div>
+      <div class="context a5-ctx">Goal: be real, be technical, be honest about what was hard</div>
+    </div>
+  </div>
+
+  <div class="explain-block">
+    <h3>💬 The Honest Technical Breakdown</h3>
+    <p>So basically — the frontend is React + React Flow for the graph canvas. React Flow is actually really good, you can make custom nodes and it handles drag-and-drop natively. Each node has a side panel for config (timeout, retry count, circuit breaker on/off). The graph gets serialized to JSON and sent to a FastAPI backend.</p>
+    <p style="margin-top:12px">The backend is where it gets interesting. I'm using NetworkX to model the service graph as a DiGraph. When you inject a failure, it runs a BFS from that node going upward through callers. For each caller it computes: does the effective latency (base + failure penalty × retries) exceed the caller's timeout? If yes, that caller fails too. Circuit breaker FSM intercepts if it's enabled — CLOSED → OPEN → HALF-OPEN. It returns a timeline of what died when.</p>
+    <p style="margin-top:12px">Then that structured output goes to Gemini — but with tool calling, not a plain prompt. I defined a function schema, Gemini fills it in. The frontend renders the filled schema as the blast radius report.</p>
+  </div>
+
+  <div class="explain-block">
+    <h3>😅 What Was Actually Hard</h3>
+    <ul>
+      <li>The retry storm logic — getting the amplification math right took way longer than expected</li>
+      <li>React Flow re-renders — you have to memo aggressively or the canvas lags on big graphs</li>
+      <li>Gemini tool calling — the schema definition syntax is finicky, errors are cryptic</li>
+      <li>Animating the faultline in order on the graph — had to build a custom BFS-timed animation queue</li>
+      <li>Making packet loss feel realistic — pure probability felt too random, had to add burst correlation</li>
+    </ul>
+  </div>
+
+  <div class="explain-block">
+    <h3>🧠 What I'd Tell You to Learn First</h3>
+    <ul>
+      <li>Read about circuit breakers before touching the code — the pattern makes way more sense conceptually first</li>
+      <li>NetworkX is incredibly simple for graph stuff, 10 minutes to get productive</li>
+      <li>React Flow has great docs, start with their custom node example</li>
+      <li>Gemini tool calling: define your schema first, test it in AI Studio before wiring it to your backend</li>
+    </ul>
+  </div>
+
+  <div class="hook a5">
+    <div class="hook-label">The Student Pitch</div>
+    "It's a chaos engineering simulator — React Flow frontend, FastAPI + NetworkX backend, Gemini for the AI report. The interesting part is the BFS propagation with circuit breaker logic. Took about 30 days, hardest part was the retry storm math. Honestly learned more about distributed systems from this than the entire OS course."
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div style="background:#0b0f1e;border-top:1px solid var(--border);padding:32px;text-align:center">
+  <p style="color:var(--muted);font-size:.85rem">Faultline · 5 Audiences · Devansh Kumar</p>
+</div>
+
+<script>
+function show(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>

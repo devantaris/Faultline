@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Faultline — Pitch Deck</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#04060f;--surface:#0b0f1e;--card:#111827;
+    --accent:#6366f1;--accent2:#a855f7;--accent3:#06b6d4;
+    --red:#ef4444;--green:#22c55e;--yellow:#f59e0b;
+    --text:#f1f5f9;--muted:#94a3b8;--border:#1e293b;
+  }
+  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Inter',sans-serif;color:var(--text)}
+  
+  /* SLIDES */
+  .slides{width:100%;height:100%;position:relative}
+  .slide{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px;opacity:0;transform:translateY(30px);transition:all .6s cubic-bezier(.4,0,.2,1);pointer-events:none}
+  .slide.active{opacity:1;transform:translateY(0);pointer-events:all}
+  .slide.exit{opacity:0;transform:translateY(-30px)}
+
+  /* NAV */
+  .nav{position:fixed;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:16px;align-items:center;z-index:100;background:rgba(11,15,30,.8);backdrop-filter:blur(12px);padding:12px 24px;border-radius:999px;border:1px solid var(--border)}
+  .nav button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;transition:color .2s;padding:4px 8px}
+  .nav button:hover{color:var(--text)}
+  .dots{display:flex;gap:8px;align-items:center}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s;cursor:pointer}
+  .dot.active{width:20px;border-radius:3px;background:var(--accent)}
+  .slide-num{position:fixed;top:24px;right:32px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)}
+
+  /* SHARED */
+  .tag{display:inline-block;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+  .tag.purple{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3)}
+  .tag.cyan{background:rgba(6,182,212,.15);color:var(--accent3);border:1px solid rgba(6,182,212,.3)}
+  .tag.green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+  .tag.red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+  h1{font-size:clamp(2rem,5vw,4.5rem);font-weight:900;line-height:1.05;letter-spacing:-.03em}
+  h2{font-size:clamp(1.5rem,3vw,2.8rem);font-weight:800;line-height:1.1;letter-spacing:-.02em}
+  h3{font-size:1.2rem;font-weight:700}
+  p{color:var(--muted);line-height:1.7;font-size:1.05rem}
+  .gradient{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .gradient2{background:linear-gradient(135deg,var(--accent3),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+  /* GRID */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;width:100%;max-width:900px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;width:100%;max-width:1000px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .3s}
+  .card:hover{border-color:var(--accent)}
+
+  /* BG EFFECTS */
+  .glow{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+  .glow1{width:600px;height:600px;background:radial-gradient(circle,rgba(99,102,241,.12),transparent 70%);top:-100px;left:-100px}
+  .glow2{width:500px;height:500px;background:radial-gradient(circle,rgba(168,85,247,.1),transparent 70%);bottom:-100px;right:-100px}
+  .slide>*{position:relative;z-index:1}
+
+  /* SLIDE-SPECIFIC */
+  .hero-sub{font-size:1.3rem;color:var(--muted);max-width:600px;text-align:center;line-height:1.6}
+  .stat-row{display:flex;gap:48px;margin-top:8px}
+  .stat{text-align:center}
+  .stat .num{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .stat .label{font-size:.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+  /* TIMELINE */
+  .timeline{width:100%;max-width:860px}
+  .tl-item{display:flex;gap:20px;padding:16px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+  .tl-item:last-child{border-bottom:none}
+  .tl-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:6px;flex-shrink:0}
+  .tl-dot.red{background:var(--red)}
+  .tl-dot.cyan{background:var(--accent3)}
+  .tl-dot.green{background:var(--green)}
+  .tl-content h4{font-size:.95rem;font-weight:700;margin-bottom:4px}
+  .tl-content p{font-size:.85rem;color:var(--muted)}
+
+  /* FEATURE CARDS */
+  .feat-num{font-family:'JetBrains Mono',monospace;font-size:2rem;font-weight:700;color:var(--border);margin-bottom:8px}
+  .feat-title{font-size:1rem;font-weight:700;margin-bottom:8px}
+  .feat-desc{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+  /* QUOTE */
+  .quote-block{background:var(--card);border-left:3px solid var(--accent);padding:24px 28px;border-radius:0 12px 12px 0;max-width:700px}
+  .quote-text{font-size:1.2rem;font-style:italic;color:var(--text);line-height:1.7;margin-bottom:12px}
+  .quote-source{font-size:.8rem;color:var(--muted);font-family:'JetBrains Mono',monospace}
+
+  /* PILL LIST */
+  .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+  .pill{padding:8px 16px;border-radius:8px;background:var(--card);border:1px solid var(--border);font-size:.85rem;color:var(--muted)}
+
+  /* SERVICE NODES */
+  .service-map{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;margin:20px 0}
+  .svc{padding:10px 18px;border-radius:10px;border:1px solid;font-size:.8rem;font-weight:600;font-family:'JetBrains Mono',monospace}
+  .svc.ok{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08)}
+  .svc.warn{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.08)}
+  .svc.dead{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.08);animation:pulse-red 1.5s infinite}
+  @keyframes pulse-red{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.4)}50%{box-shadow:0 0 0 8px rgba(239,68,68,0)}}
+  .arrow{color:var(--muted);font-size:1.2rem}
+
+  /* TABLE */
+  table{width:100%;max-width:900px;border-collapse:collapse}
+  th{text-align:left;padding:12px 16px;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border)}
+  td{padding:12px 16px;font-size:.9rem;border-bottom:1px solid rgba(30,41,59,.5)}
+  tr:last-child td{border-bottom:none}
+  td:first-child{font-weight:600;color:var(--text)}
+
+  /* FINAL SLIDE */
+  .final-links{display:flex;gap:16px;margin-top:32px}
+  .btn{padding:14px 32px;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;border:none;transition:all .3s}
+  .btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+  .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="glow glow1"></div>
+<div class="glow glow2"></div>
+<div class="slide-num" id="slideNum">01 / 09</div>
+
+<div class="slides" id="slides">
+
+  <!-- SLIDE 1: HERO -->
+  <div class="slide active" id="s1">
+    <div style="text-align:center;max-width:800px">
+      <div class="tag purple" style="margin-bottom:24px">🚨 Chaos Engineering · Observability · Distributed Systems</div>
+      <h1 style="margin-bottom:20px">
+        <span class="gradient">Faultline</span>
+      </h1>
+      <p class="hero-sub" style="font-size:1.5rem;margin-bottom:12px;color:var(--text)">Break your architecture before production does.</p>
+      <p class="hero-sub">Draw your microservices. Inject failures. Watch the faultline. Get an AI-generated blast radius report.</p>
+      <div class="stat-row" style="margin-top:40px;justify-content:center">
+        <div class="stat"><div class="num">5</div><div class="label">Core Systems</div></div>
+        <div class="stat"><div class="num">30</div><div class="label">Day Build</div></div>
+        <div class="stat"><div class="num">∞</div><div class="label">Failure Modes</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: THE PROBLEM -->
+  <div class="slide" id="s2">
+    <div style="max-width:800px;width:100%">
+      <div class="tag red" style="margin-bottom:20px">The Problem</div>
+      <h2 style="margin-bottom:24px">Production is your only <span class="gradient">chaos lab.</span></h2>
+      <div class="grid-2">
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">💸</div>
+          <h3 style="margin-bottom:8px">Outages are expensive</h3>
+          <p style="font-size:.9rem">Amazon loses ~$220k/min in downtime. Most teams find out what breaks when it breaks.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🧩</div>
+          <h3 style="margin-bottom:8px">Microservices are invisible</h3>
+          <p style="font-size:.9rem">No one person understands the full dependency graph. Auth fails → payment fails → orders queue explodes.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🔥</div>
+          <h3 style="margin-bottom:8px">Cascading failures are non-obvious</h3>
+          <p style="font-size:.9rem">A 200ms delay in one service becomes a 12-second chain reaction. Retry storms amplify everything.</p>
+        </div>
+        <div class="card">
+          <div style="font-size:2rem;margin-bottom:12px">🛠️</div>
+          <h3 style="margin-bottom:8px">Tools are complex or expensive</h3>
+          <p style="font-size:.9rem">Gremlin costs $thousands/mo. Chaos Mesh requires a full K8s cluster. There's no visual simulator.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: THE SOLUTION -->
+  <div class="slide" id="s3">
+    <div style="max-width:800px;width:100%">
+      <div class="tag cyan" style="margin-bottom:20px">The Solution</div>
+      <h2 style="margin-bottom:16px">A <span class="gradient2">visual chaos simulator</span> with AI intelligence.</h2>
+      <p style="margin-bottom:32px;max-width:600px">You design your architecture. You inject the failure. Faultline simulates the exact propagation path — and Gemini tells you what it means.</p>
+      <div class="service-map">
+        <div class="svc ok">Auth Service</div>
+        <div class="arrow">→</div>
+        <div class="svc dead">Payment API ⚡</div>
+        <div class="arrow">→</div>
+        <div class="svc warn">Orders Service</div>
+        <div class="arrow">→</div>
+        <div class="svc warn">Notifications</div>
+      </div>
+      <div class="quote-block" style="margin-top:28px">
+        <div class="quote-text">"Payment API is down. Orders service will faultline in ~8s. 68% of users affected. Circuit breaker at Auth has tripped."</div>
+        <div class="quote-source">— Faultline AI Report (Gemini 1.5 Pro)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 4: 5 FEATURES -->
+  <div class="slide" id="s4">
+    <div style="max-width:1000px;width:100%">
+      <div class="tag purple" style="margin-bottom:20px">Five Systems</div>
+      <h2 style="margin-bottom:28px">Everything you need to <span class="gradient">simulate reality.</span></h2>
+      <div class="grid-3" style="grid-template-columns:repeat(5,1fr);gap:16px;max-width:1000px">
+        <div class="card" style="padding:20px">
+          <div class="feat-num">01</div>
+          <div class="feat-title">Topology Builder</div>
+          <div class="feat-desc">Drag-and-drop service graph. Configure timeouts, retries, circuit breakers per node.</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="feat-num">02</div>
+          <div class="feat-title">Failure Injection</div>
+          <div class="feat-desc">Crash, delay, packet loss, memory spike. Click any node. Hit simulate.</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="feat-num">03</div>
+          <div class="feat-title">Faultline Engine</div>
+          <div class="feat-desc">BFS/DFS propagation with retry storms, timeouts, circuit breaker logic.</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="feat-num">04</div>
+          <div class="feat-title">Blast Radius AI</div>
+          <div class="feat-desc">Gemini generates plain-English impact report with recovery estimates.</div>
+        </div>
+        <div class="card" style="padding:20px">
+          <div class="feat-num">05</div>
+          <div class="feat-title">Observability</div>
+          <div class="feat-desc">Live health scores, latency graphs, error rates — real monitoring UX.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: TECH STACK -->
+  <div class="slide" id="s5">
+    <div style="max-width:800px;width:100%">
+      <div class="tag cyan" style="margin-bottom:20px">Tech Stack</div>
+      <h2 style="margin-bottom:28px">Built with <span class="gradient2">production-grade</span> tools.</h2>
+      <table>
+        <thead>
+          <tr><th>Layer</th><th>Technology</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Frontend Canvas</td><td>React + React Flow</td><td>Drag-and-drop graph with custom nodes</td></tr>
+          <tr><td>Simulation Engine</td><td>Python / FastAPI</td><td>Graph traversal + failure propagation logic</td></tr>
+          <tr><td>AI Reports</td><td>Gemini 1.5 Pro (tool calling)</td><td>Structured blast radius generation</td></tr>
+          <tr><td>Metrics Store</td><td>In-memory (Redis optional)</td><td>Real-time health score tracking</td></tr>
+          <tr><td>Graph Algo</td><td>NetworkX / custom BFS</td><td>Dependency chain resolution</td></tr>
+          <tr><td>Viz Charts</td><td>Recharts / D3</td><td>Live latency + error rate panels</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: WHAT YOU LEARN -->
+  <div class="slide" id="s6">
+    <div style="max-width:800px;width:100%">
+      <div class="tag green" style="margin-bottom:20px">Interview Ammunition</div>
+      <h2 style="margin-bottom:24px">What you can say <span class="gradient">you built.</span></h2>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h4>Distributed Systems Failure Modes</h4><p>Cascading failures, retry amplification, split-brain scenarios — all simulated, not theorized.</p></div></div>
+        <div class="tl-item"><div class="tl-dot cyan"></div><div class="tl-content"><h4>Circuit Breaker Pattern</h4><p>Implemented closed → open → half-open state machine with configurable thresholds.</p></div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-content"><h4>Graph Algorithms for Fault Propagation</h4><p>BFS/DFS traversal with weighted edges for latency-aware faultline simulation.</p></div></div>
+        <div class="tl-item"><div class="tl-dot cyan"></div><div class="tl-content"><h4>LLM Tool-Calling for Structured Output</h4><p>Gemini function calling to generate typed blast radius reports from simulation JSON.</p></div></div>
+        <div class="tl-item"><div class="tl-dot green"></div><div class="tl-content"><h4>Observability Engineering</h4><p>Metrics collection, health scoring, latency percentile tracking — real SRE concepts.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 7: WHO CARES -->
+  <div class="slide" id="s7">
+    <div style="max-width:800px;width:100%">
+      <div class="tag red" style="margin-bottom:20px">Market Fit</div>
+      <h2 style="margin-bottom:24px">Who opens this and <span class="gradient">immediately gets it.</span></h2>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="margin-bottom:12px">🎯 Reliability Teams</h3>
+          <p style="font-size:.85rem">Paytm, Zomato, MakeMyTrip, Razorpay all have SRE teams. This is their language.</p>
+          <div class="pills"><span class="pill">SRE</span><span class="pill">Chaos Eng</span><span class="pill">Incident Mgmt</span></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px">🎓 Recruiters & Hirers</h3>
+          <p style="font-size:.85rem">Understand in 30 seconds. Visual, interactive, real outcomes. Not another CRUD app.</p>
+          <div class="pills"><span class="pill">Visual Demo</span><span class="pill">Live URL</span><span class="pill">GitHub</span></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px">🎤 Conference Talks</h3>
+          <p style="font-size:.85rules">KubeCon / SREcon — "Building a visual chaos simulator with LLM-powered blast radius analysis."</p>
+          <div class="pills"><span class="pill">KubeCon</span><span class="pill">SREcon</span><span class="pill">DevFest</span></div>
+        </div>
+        <div class="card">
+          <h3 style="margin-bottom:12px">📚 Teaching Tool</h3>
+          <p style="font-size:.85rem">Every CS student learning distributed systems needs this. Could be open-sourced and starred.</p>
+          <div class="pills"><span class="pill">Open Source</span><span class="pill">Education</span><span class="pill">Stars</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: ROADMAP -->
+  <div class="slide" id="s8">
+    <div style="max-width:800px;width:100%">
+      <div class="tag purple" style="margin-bottom:20px">30-Day Roadmap</div>
+      <h2 style="margin-bottom:28px">Ship in <span class="gradient">one month.</span></h2>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><h4>Week 1 — Topology Builder</h4><p>React Flow canvas, drag-and-drop nodes, service config panel, edge connections.</p></div></div>
+        <div class="tl-item"><div class="tl-dot cyan"></div><div class="tl-content"><h4>Week 2 — Simulation Engine</h4><p>FastAPI backend, graph traversal, failure modes, circuit breaker state machine.</p></div></div>
+        <div class="tl-item"><div class="tl-dot red"></div><div class="tl-content"><h4>Week 3 — AI Reports + Observability</h4><p>Gemini tool-calling integration, blast radius report, health metrics dashboard.</p></div></div>
+        <div class="tl-item"><div class="tl-dot green"></div><div class="tl-content"><h4>Week 4 — Polish + Ship</h4><p>Preset architectures (e-commerce, banking), README, live URL deploy, demo video.</p></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 9: FINALE -->
+  <div class="slide" id="s9">
+    <div style="text-align:center;max-width:700px">
+      <div class="tag green" style="margin-bottom:24px">The Goal</div>
+      <h2 style="margin-bottom:20px">A senior SRE at Zomato opens this and goes:</h2>
+      <div class="quote-block" style="text-align:left;margin:24px auto">
+        <div class="quote-text">"This sophomore built a visual chaos engineering tool with AI blast radius analysis. I need to talk to them."</div>
+        <div class="quote-source">— The reaction we're engineering for</div>
+      </div>
+      <div class="stat-row" style="justify-content:center;margin-top:32px">
+        <div class="stat"><div class="num">1</div><div class="label">Live URL</div></div>
+        <div class="stat"><div class="num">1</div><div class="label">Demo Video</div></div>
+        <div class="stat"><div class="num">⭐</div><div class="label">GitHub Stars</div></div>
+      </div>
+      <div class="final-links">
+        <button class="btn btn-primary">Start Building →</button>
+        <button class="btn btn-outline">View Roadmap</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button onclick="changeSlide(-1)" id="prevBtn">←</button>
+  <div class="dots" id="dots"></div>
+  <button onclick="changeSlide(1)" id="nextBtn">→</button>
+</div>
+
+<script>
+  const total = 9;
+  let current = 0;
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  const slideNum = document.getElementById('slideNum');
+
+  // Build dots
+  for(let i=0;i<total;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    d.onclick = ()=>goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n){
+    slides[current].classList.remove('active');
+    slides[current].classList.add('exit');
+    setTimeout(()=>slides[current].classList.remove('exit'),600);
+    current = (n+total)%total;
+    slides[current].classList.add('active');
+    document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+    slideNum.textContent = String(current+1).padStart(2,'0') + ' / ' + String(total).padStart(2,'0');
+  }
+
+  function changeSlide(dir){ goTo(current+dir); }
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key==='ArrowDown') changeSlide(1);
+    if(e.key==='ArrowLeft'||e.key==='ArrowUp') changeSlide(-1);
+  });
+
+  // Touch swipe
+  let tx=0;
+  document.addEventListener('touchstart',e=>tx=e.touches[0].clientX);
+  document.addEventListener('touchend',e=>{
+    const dx=tx-e.changedTouches[0].clientX;
+    if(Math.abs(dx)>50) changeSlide(dx>0?1:-1);
+  });
+</script>
+</body>
+</html>

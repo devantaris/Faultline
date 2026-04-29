@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Faultline — Build Phases</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#04060f;--card:#0f1729;--border:#1e293b;--accent:#6366f1;--accent2:#a855f7;--accent3:#06b6d4;--red:#ef4444;--green:#22c55e;--yellow:#f59e0b;--text:#f1f5f9;--muted:#94a3b8}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif}
+.hero{padding:70px 60px 50px;text-align:center;border-bottom:1px solid var(--border);background:linear-gradient(180deg,rgba(99,102,241,.1),transparent)}
+.hero h1{font-size:3rem;font-weight:900;letter-spacing:-.03em;background:linear-gradient(135deg,#6366f1,#a855f7,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:12px}
+.hero p{color:var(--muted);font-size:1.1rem;max-width:600px;margin:0 auto}
+.tag{display:inline-block;padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px;background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3)}
+.main{max-width:960px;margin:0 auto;padding:60px 40px}
+
+/* PHASE FLOW */
+.phase-flow{display:flex;flex-direction:column;gap:0;position:relative}
+.phase-flow::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent),var(--accent2),var(--accent3),var(--green));opacity:.3}
+.phase{display:flex;gap:28px;align-items:flex-start;position:relative;padding-bottom:48px}
+.phase:last-child{padding-bottom:0}
+.phase-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;border:2px solid;position:relative;z-index:1;background:var(--bg)}
+.phase-icon.p1{border-color:var(--accent);box-shadow:0 0 20px rgba(99,102,241,.3)}
+.phase-icon.p2{border-color:var(--accent2);box-shadow:0 0 20px rgba(168,85,247,.3)}
+.phase-icon.p3{border-color:var(--accent3);box-shadow:0 0 20px rgba(6,182,212,.3)}
+.phase-icon.p4{border-color:var(--yellow);box-shadow:0 0 20px rgba(245,158,11,.3)}
+.phase-icon.p5{border-color:var(--red);box-shadow:0 0 20px rgba(239,68,68,.3)}
+.phase-icon.p6{border-color:var(--green);box-shadow:0 0 20px rgba(34,197,94,.3)}
+.phase-body{flex:1;padding-top:8px}
+.phase-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.phase-title{font-size:1.5rem;font-weight:800;margin-bottom:10px}
+.phase-title.c1{color:var(--accent)}
+.phase-title.c2{color:var(--accent2)}
+.phase-title.c3{color:var(--accent3)}
+.phase-title.c4{color:var(--yellow)}
+.phase-title.c5{color:var(--red)}
+.phase-title.c6{color:var(--green)}
+.phase-desc{color:var(--muted);font-size:.95rem;line-height:1.7;margin-bottom:16px}
+.tasks{display:flex;flex-wrap:wrap;gap:8px}
+.task{padding:6px 14px;border-radius:8px;font-size:.8rem;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.task.highlight{border-color:rgba(99,102,241,.4);color:var(--accent);background:rgba(99,102,241,.08)}
+.concepts{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px}
+.concept{padding:4px 10px;border-radius:4px;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace}
+.concept.purple{background:rgba(99,102,241,.15);color:var(--accent)}
+.concept.pink{background:rgba(168,85,247,.15);color:var(--accent2)}
+.concept.cyan{background:rgba(6,182,212,.15);color:var(--accent3)}
+.concept.yellow{background:rgba(245,158,11,.15);color:var(--yellow)}
+.concept.red{background:rgba(239,68,68,.15);color:var(--red)}
+.concept.green{background:rgba(34,197,94,.15);color:var(--green)}
+.divider{border:none;border-top:1px solid var(--border);margin:60px 0}
+
+/* INTERVIEW SECTION */
+.interview{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(168,85,247,.05));border:1px solid rgba(99,102,241,.2);border-radius:16px;padding:36px;margin-top:48px}
+.interview h2{font-size:1.6rem;font-weight:800;margin-bottom:24px}
+.qa{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(99,102,241,.12)}
+.qa:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q{font-weight:700;font-size:.9rem;margin-bottom:8px}
+.a{font-size:.85rem;color:var(--muted);line-height:1.65}
+
+/* CONCEPT GRID */
+.concept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
+.ccard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.ccard .icon{font-size:1.4rem;margin-bottom:8px}
+.ccard h3{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.ccard p{font-size:.75rem;color:var(--muted);line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="tag">Intellectual Roadmap</div>
+  <h1>Build Phases</h1>
+  <p>Six sequential phases — from blank canvas to production deployment. Each phase builds on the last.</p>
+</div>
+
+<div class="main">
+
+<div class="phase-flow">
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-icon p1">🧠</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 01</div>
+      <div class="phase-title c1">Research & Architecture Design</div>
+      <div class="phase-desc">Before a single line of code, deeply understand what you're building and why. Study real chaos engineering tools (Gremlin, Chaos Monkey, Chaos Mesh). Understand circuit breaker patterns, retry storm mechanics, and graph-based failure propagation. Design the full system architecture on paper first — what data flows where, what the API contract looks like, what the simulation output schema is.</div>
+      <div class="tasks">
+        <div class="task highlight">Study real chaos tools</div>
+        <div class="task highlight">Define service node schema</div>
+        <div class="task">Read Netflix Hystrix docs</div>
+        <div class="task">Map frontend ↔ backend API</div>
+        <div class="task">Sketch graph traversal logic</div>
+        <div class="task">Research React Flow library</div>
+      </div>
+      <div class="concepts">
+        <div class="concept purple">circuit-breaker theory</div>
+        <div class="concept cyan">graph algorithms</div>
+        <div class="concept pink">failure modes taxonomy</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-icon p2">🗺️</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 02</div>
+      <div class="phase-title c2">Foundation & Topology Builder</div>
+      <div class="phase-desc">Build the visual canvas first — this is what users see immediately. Set up React + Vite frontend and FastAPI backend. Implement the drag-and-drop graph editor using React Flow with custom node components. Each node must be configurable (timeout, retry count, circuit breaker toggle). Edges carry latency and dependency type. Export the entire graph as a validated JSON schema ready for the simulation engine.</div>
+      <div class="tasks">
+        <div class="task highlight">React Flow canvas</div>
+        <div class="task highlight">Custom node component</div>
+        <div class="task highlight">Config side panel</div>
+        <div class="task">Edge property editor</div>
+        <div class="task">Preset architecture loader</div>
+        <div class="task">Graph JSON export</div>
+        <div class="task">FastAPI scaffold + CORS</div>
+      </div>
+      <div class="concepts">
+        <div class="concept purple">react-flow</div>
+        <div class="concept cyan">graph-schema-design</div>
+        <div class="concept yellow">api-contracts</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-icon p3">⚡</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 03</div>
+      <div class="phase-title c3">Simulation Engine</div>
+      <div class="phase-desc">The intellectual core. Build the Python backend that takes a graph + failure seed and computes the full propagation. Implement BFS traversal from the failed node through its callers. Model all four failure types with distinct physics: crash (instant), delay (latency budget chain), packet loss (probabilistic), memory (gradual OOM). Implement the 3-state circuit breaker FSM. Compute retry storm amplification. Return a structured timeline of which service fails when, and why.</div>
+      <div class="tasks">
+        <div class="task highlight">NetworkX DiGraph model</div>
+        <div class="task highlight">BFS propagation from seed</div>
+        <div class="task highlight">Circuit breaker FSM</div>
+        <div class="task highlight">Retry storm amplification</div>
+        <div class="task">Timeout chain logic</div>
+        <div class="task">Packet loss simulation</div>
+        <div class="task">Memory OOM modelling</div>
+        <div class="task">Structured timeline output</div>
+      </div>
+      <div class="concepts">
+        <div class="concept purple">BFS / DFS</div>
+        <div class="concept red">retry-storms</div>
+        <div class="concept cyan">timeout-chains</div>
+        <div class="concept pink">circuit-breaker FSM</div>
+        <div class="concept yellow">CAP theorem</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-icon p4">🤖</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 04</div>
+      <div class="phase-title c4">AI Blast Radius Report</div>
+      <div class="phase-desc">Wire Gemini into the simulation pipeline. After each simulation run, the structured output (affected services, faultline timeline, user impact %, recovery estimate) is passed to Gemini via tool calling — not a free-text prompt. Gemini returns a typed, structured blast radius report that is rendered in the frontend as a readable incident summary. This is how LLMs should be used in engineering systems: grounded in real data, not hallucinating.</div>
+      <div class="tasks">
+        <div class="task highlight">Gemini tool-calling schema</div>
+        <div class="task highlight">Simulation → report pipeline</div>
+        <div class="task">Report UI component</div>
+        <div class="task">Severity color coding</div>
+        <div class="task">Recovery ETA display</div>
+        <div class="task">Affected users % gauge</div>
+      </div>
+      <div class="concepts">
+        <div class="concept pink">LLM tool-calling</div>
+        <div class="concept purple">structured output</div>
+        <div class="concept cyan">gemini-api</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5 -->
+  <div class="phase">
+    <div class="phase-icon p5">📊</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 05</div>
+      <div class="phase-title c5">Observability Layer</div>
+      <div class="phase-desc">Turn Faultline from a simulation toy into something that looks and feels like a real monitoring platform. Build a live metrics dashboard that updates as the simulation plays out. Show health scores (0.0–1.0) per service, real-time latency charts (P50/P95/P99), error rate bars, and RPS showing the retry storm amplification visually. Animate the failure propagation on the graph itself — nodes flash red in BFS order, edges pulse. Add a timeline scrubber.</div>
+      <div class="tasks">
+        <div class="task highlight">Health score per node</div>
+        <div class="task highlight">Latency line charts</div>
+        <div class="task highlight">Faultline animation on graph</div>
+        <div class="task">Error rate bar chart</div>
+        <div class="task">RPS / retry storm visual</div>
+        <div class="task">Timeline scrubber</div>
+        <div class="task">Node color by health</div>
+      </div>
+      <div class="concepts">
+        <div class="concept green">observability-3-pillars</div>
+        <div class="concept cyan">recharts / D3</div>
+        <div class="concept yellow">health-scoring</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 6 -->
+  <div class="phase">
+    <div class="phase-icon p6">🚀</div>
+    <div class="phase-body">
+      <div class="phase-label">Phase 06</div>
+      <div class="phase-title c6">Polish, Deploy & Launch</div>
+      <div class="phase-desc">The final phase is about making it undeniable. Add one-click scenario presets (auth outage, DB overload, payment spike) so any visitor can see a full simulation without setup. Polish the UI — dark theme, glass cards, micro-animations, loading states. Dockerize the FastAPI backend, deploy to Railway/Render. Deploy React frontend to Vercel. Write a README with architecture diagram, demo GIF, and live URL. Record a 2-minute demo video. Post. Done.</div>
+      <div class="tasks">
+        <div class="task highlight">Scenario presets</div>
+        <div class="task highlight">Docker + backend deploy</div>
+        <div class="task highlight">Vercel frontend deploy</div>
+        <div class="task highlight">README + demo GIF</div>
+        <div class="task">UI polish pass</div>
+        <div class="task">Export / share feature</div>
+        <div class="task">Demo video (2 min)</div>
+        <div class="task">LinkedIn + GitHub post</div>
+      </div>
+      <div class="concepts">
+        <div class="concept green">docker</div>
+        <div class="concept cyan">vercel / railway</div>
+        <div class="concept yellow">devops</div>
+        <div class="concept green">launch</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end phase-flow -->
+
+<hr style="border:none;border-top:1px solid var(--border);margin:60px 0"/>
+
+<div>
+  <div class="tag">CS Concepts Mastered</div>
+  <h2 style="font-size:1.8rem;font-weight:800;margin-bottom:8px">What You Walk Away Knowing</h2>
+  <p style="color:var(--muted);margin-bottom:0">Concepts you can now speak fluently about in any systems design interview.</p>
+  <div class="concept-grid">
+    <div class="ccard"><div class="icon">🔁</div><h3>Circuit Breaker</h3><p>3-state FSM from scratch. CLOSED → OPEN → HALF-OPEN with real threshold logic.</p></div>
+    <div class="ccard"><div class="icon">⚡</div><h3>Retry Storms</h3><p>Amplification = retries × callers. Why slow is more dangerous than dead.</p></div>
+    <div class="ccard"><div class="icon">⏱️</div><h3>Timeout Chains</h3><p>Latency budget propagation across service boundaries with deadline inheritance.</p></div>
+    <div class="ccard"><div class="icon">🗺️</div><h3>Graph Algorithms</h3><p>BFS for failure propagation. Topological sort for evaluation order.</p></div>
+    <div class="ccard"><div class="icon">📊</div><h3>Observability</h3><p>Metrics, logs, traces — the 3 pillars. Health scoring and P99 latency.</p></div>
+    <div class="ccard"><div class="icon">🤖</div><h3>LLM Tool Calling</h3><p>Structured function calling to ground LLM output in real simulation data.</p></div>
+    <div class="ccard"><div class="icon">🌐</div><h3>CAP Theorem</h3><p>Node failure forces consistency vs availability. Modelled as hard vs soft deps.</p></div>
+    <div class="ccard"><div class="icon">🕸️</div><h3>Service Mesh</h3><p>Sidecar proxy model, traffic policies — foundation for Istio/Envoy discussions.</p></div>
+  </div>
+</div>
+
+<div class="interview">
+  <h2>🎤 Interview Answers You Now Own</h2>
+  <div class="qa">
+    <div class="q">"Tell me about a distributed systems project."</div>
+    <div class="a">I built Faultline — a visual chaos engineering simulator. You draw your microservices graph, inject failures, and it simulates propagation using BFS traversal, real circuit breaker logic, and retry storm amplification. Gemini then generates a structured blast radius report. I learned more about failure modes building this than any course.</div>
+  </div>
+  <div class="qa">
+    <div class="q">"How does a circuit breaker work?"</div>
+    <div class="a">It's a 3-state FSM. CLOSED is normal — requests flow, failure rate tracked in a rolling window. When failures exceed threshold, it goes OPEN — all requests fail-fast immediately. After a timeout it goes HALF-OPEN, sends one probe. Success → CLOSED. Failure → OPEN again. I implemented this from scratch in Faultline's simulation engine.</div>
+  </div>
+  <div class="qa">
+    <div class="q">"Why are retry storms dangerous?"</div>
+    <div class="a">A slow service is more dangerous than a dead one. When slow, callers retry. 3 retries × 10 concurrent callers = 30x load. More load → more slowness → more retries. Exponential explosion. A dead service triggers circuit breakers and fails fast. I model this amplification factor in Faultline and visualize the spike on the RPS chart.</div>
+  </div>
+</div>
+
+</div><!-- end main -->
+
+<div style="background:#0b0f1e;border-top:1px solid var(--border);padding:32px;text-align:center">
+  <p style="color:var(--muted);font-size:.85rem">Faultline · Intellectual Build Roadmap · Devansh Kumar</p>
+</div>
+
+</body>
+</html>

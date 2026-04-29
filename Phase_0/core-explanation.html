@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Faultline — Core Explanation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#04060f;--surface:#0b0f1e;--card:#0f1729;--border:#1e293b;--accent:#6366f1;--accent2:#a855f7;--accent3:#06b6d4;--red:#ef4444;--green:#22c55e;--yellow:#f59e0b;--text:#f1f5f9;--muted:#94a3b8}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.7;padding:0}
+.hero{background:linear-gradient(135deg,rgba(99,102,241,.15),rgba(168,85,247,.1));border-bottom:1px solid var(--border);padding:80px 60px;text-align:center}
+.hero h1{font-size:3.5rem;font-weight:900;letter-spacing:-.03em;background:linear-gradient(135deg,#6366f1,#a855f7,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.hero p{font-size:1.2rem;color:var(--muted);max-width:700px;margin:0 auto}
+.container{max-width:960px;margin:0 auto;padding:60px 40px}
+h2{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-bottom:8px}
+h3{font-size:1.2rem;font-weight:700;margin-bottom:10px}
+p{color:var(--muted);margin-bottom:16px}
+.section{margin-bottom:72px}
+.tag{display:inline-block;padding:4px 12px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px}
+.tag.purple{background:rgba(99,102,241,.15);color:var(--accent);border:1px solid rgba(99,102,241,.3)}
+.tag.cyan{background:rgba(6,182,212,.15);color:var(--accent3);border:1px solid rgba(6,182,212,.3)}
+.tag.green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)}
+.tag.red{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.tag.yellow{background:rgba(245,158,11,.15);color:var(--yellow);border:1px solid rgba(245,158,11,.3)}
+.grid{display:grid;gap:20px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;transition:border-color .3s}
+.card:hover{border-color:var(--accent)}
+code{font-family:'JetBrains Mono',monospace;font-size:.85rem;background:rgba(99,102,241,.12);color:var(--accent);padding:2px 8px;border-radius:4px}
+pre{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;font-family:'JetBrains Mono',monospace;font-size:.85rem;color:#e2e8f0;overflow-x:auto;margin:20px 0;line-height:1.8}
+.kw{color:var(--accent2)}
+.fn{color:var(--accent3)}
+.str{color:var(--green)}
+.cm{color:#475569}
+.divider{border:none;border-top:1px solid var(--border);margin:48px 0}
+.arch-flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:24px 0}
+.node{padding:10px 20px;border-radius:10px;font-size:.85rem;font-weight:700;font-family:'JetBrains Mono',monospace;border:1px solid}
+.node.purple{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,.1)}
+.node.cyan{border-color:var(--accent3);color:var(--accent3);background:rgba(6,182,212,.1)}
+.node.green{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.1)}
+.node.red{border-color:var(--red);color:var(--red);background:rgba(239,68,68,.1)}
+.node.yellow{border-color:var(--yellow);color:var(--yellow);background:rgba(245,158,11,.1);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.4)}50%{box-shadow:0 0 0 8px rgba(245,158,11,0)}}
+.arrow{color:var(--muted);font-size:1.3rem}
+.insight{background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(168,85,247,.05));border:1px solid rgba(99,102,241,.2);border-radius:12px;padding:20px 24px;margin:20px 0}
+.insight strong{color:var(--text)}
+ul{color:var(--muted);padding-left:24px}
+ul li{margin-bottom:8px}
+table{width:100%;border-collapse:collapse;margin:20px 0}
+th{text-align:left;padding:12px 16px;font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--border)}
+td{padding:12px 16px;font-size:.9rem;border-bottom:1px solid rgba(30,41,59,.5);color:var(--muted)}
+td:first-child{color:var(--text);font-weight:600}
+.cb-states{display:flex;gap:16px;margin:20px 0}
+.cb-state{flex:1;border-radius:12px;padding:20px;border:1px solid;text-align:center}
+.cb-state h4{font-size:.9rem;font-weight:700;margin-bottom:6px}
+.cb-state p{font-size:.8rem;margin:0}
+.cb-state.closed{border-color:var(--green);background:rgba(34,197,94,.07);color:var(--green)}
+.cb-state.open{border-color:var(--red);background:rgba(239,68,68,.07);color:var(--red)}
+.cb-state.half{border-color:var(--yellow);background:rgba(245,158,11,.07);color:var(--yellow)}
+.metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center}
+.metric .val{font-size:1.8rem;font-weight:900;font-family:'JetBrains Mono',monospace}
+.metric .lbl{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:4px}
+.metric.red .val{color:var(--red)}
+.metric.green .val{color:var(--green)}
+.metric.yellow .val{color:var(--yellow)}
+.metric.cyan .val{color:var(--accent3)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="tag purple">Full Technical Breakdown</div>
+  <h1>Faultline</h1>
+  <p>Every system, algorithm, design decision, and concept behind the Distributed System Failure Simulator.</p>
+</div>
+
+<div class="container">
+
+  <!-- WHAT IS THIS -->
+  <div class="section">
+    <div class="tag purple">What Is Faultline?</div>
+    <h2>The core idea in one sentence</h2>
+    <p>Faultline is a browser-based tool that lets you visually construct a microservices dependency graph, inject specific failure types into any service, and watch a physics-accurate simulation of how that failure propagates — producing an AI-generated blast radius report at the end.</p>
+    <div class="insight">
+      <strong>Why it matters:</strong> In distributed systems, failures are rarely local. A 200ms latency spike in a payment API causes retries, which cause a retry storm, which exhausts connection pools, which crashes the orders service, which triggers alerts, which wakes up 3 engineers at 3am. Faultline lets you discover this chain before production does.
+    </div>
+    <div class="arch-flow">
+      <div class="node purple">Draw Graph</div><div class="arrow">→</div>
+      <div class="node red">Inject Failure</div><div class="arrow">→</div>
+      <div class="node yellow">Simulate Faultline</div><div class="arrow">→</div>
+      <div class="node cyan">AI Report</div><div class="arrow">→</div>
+      <div class="node green">Fix Before Prod</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SYSTEM 1: TOPOLOGY -->
+  <div class="section">
+    <div class="tag cyan">System 1</div>
+    <h2>Topology Builder</h2>
+    <p>The canvas where users construct their microservices architecture. Built on <strong>React Flow</strong>, it provides a drag-and-drop interface with custom node types and configurable edge properties.</p>
+    <div class="grid grid-2" style="margin:24px 0">
+      <div class="card">
+        <h3>Node Properties</h3>
+        <ul>
+          <li><code>timeout_ms</code> — request timeout threshold</li>
+          <li><code>retry_count</code> — max retries before fail</li>
+          <li><code>circuit_breaker</code> — on/off toggle</li>
+          <li><code>cb_threshold</code> — failure % to trip breaker</li>
+          <li><code>instance_count</code> — replicas running</li>
+          <li><code>memory_limit_mb</code> — resource cap</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Edge Properties</h3>
+        <ul>
+          <li><code>latency_ms</code> — baseline network delay</li>
+          <li><code>protocol</code> — HTTP, gRPC, async</li>
+          <li><code>dependency_type</code> — hard vs soft</li>
+          <li><code>traffic_weight</code> — % of calls going this path</li>
+        </ul>
+        <p style="margin-top:12px;font-size:.85rem">Hard dependencies: if target fails, caller fails. Soft: caller degrades but survives.</p>
+      </div>
+    </div>
+    <pre><span class="cm">// Service node schema (exported to simulation engine)</span>
+{
+  <span class="str">"id"</span>: <span class="str">"payment-api"</span>,
+  <span class="str">"label"</span>: <span class="str">"Payment API"</span>,
+  <span class="str">"timeout_ms"</span>: 3000,
+  <span class="str">"retry_count"</span>: 3,
+  <span class="str">"circuit_breaker"</span>: <span class="kw">true</span>,
+  <span class="str">"cb_threshold"</span>: 0.5,
+  <span class="str">"dependencies"</span>: [<span class="str">"auth-service"</span>, <span class="str">"db-primary"</span>],
+  <span class="str">"health"</span>: 1.0
+}</pre>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SYSTEM 2: FAILURE INJECTION -->
+  <div class="section">
+    <div class="tag red">System 2</div>
+    <h2>Failure Injection Engine</h2>
+    <p>Four failure modes, each with distinct propagation physics. The user selects a node, picks a failure type, configures severity, and triggers the simulation.</p>
+    <div class="grid grid-2" style="margin:24px 0">
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:8px">💥</div>
+        <h3>Service Crash</h3>
+        <p style="font-size:.85rem">Hard node removal. All callers immediately see connection refused. Circuit breakers at callers trip if configured. Propagation: instant, breadth-first.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:8px">🐢</div>
+        <h3>Network Delay</h3>
+        <p style="font-size:.85rem">Adds configurable latency (ms) to all responses. Callers accumulate wait time. Timeout chain triggers if total > caller's timeout_ms. Causes retry amplification.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:8px">📦</div>
+        <h3>Packet Loss</h3>
+        <p style="font-size:.85rem">Probabilistic drop rate (e.g. 40%). Each request has a dice roll. Failed packets trigger retries. If retry_count * latency > timeout → failure. Faultlines stochastically.</p>
+      </div>
+      <div class="card">
+        <div style="font-size:1.5rem;margin-bottom:8px">🧠</div>
+        <h3>Memory Spike</h3>
+        <p style="font-size:.85rem">Consumes memory up to limit. GC pressure causes latency jitter. If OOM: crash. Affects concurrency capacity. Slowest propagation — gradual degradation pattern.</p>
+      </div>
+    </div>
+    <div class="insight">
+      <strong>Key insight:</strong> Different failure types produce radically different blast shapes. A crash is a sharp spike. A memory leak is a slow curve. A delay causes a retry storm (the most dangerous and least intuitive). Faultline shows all of these visually.
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SYSTEM 3: SIMULATION ENGINE -->
+  <div class="section">
+    <div class="tag yellow">System 3</div>
+    <h2>Faultline Simulation Engine</h2>
+    <p>The backend Python engine that takes the graph + failure seed and runs the propagation simulation. This is the intellectual core of the project.</p>
+
+    <h3 style="margin-top:28px;margin-bottom:12px">Graph Representation</h3>
+    <p>Services = nodes. Calls = directed edges. NetworkX DiGraph internally. Topological sort determines evaluation order. BFS from failure seed node.</p>
+
+    <h3 style="margin-top:24px;margin-bottom:12px">Propagation Algorithm</h3>
+    <pre><span class="kw">def</span> <span class="fn">simulate_faultline</span>(graph, failed_node, failure_type, severity):
+    queue = deque([failed_node])
+    visited = {failed_node: <span class="str">"DEAD"</span>}
+    timeline = []
+    t = 0
+
+    <span class="kw">while</span> queue:
+        node = queue.popleft()
+        callers = graph.predecessors(node)  <span class="cm"># who calls this node?</span>
+
+        <span class="kw">for</span> caller <span class="kw">in</span> callers:
+            edge = graph[caller][node]
+            <span class="cm"># calculate effective latency seen by caller</span>
+            effective_latency = <span class="fn">compute_effective_latency</span>(
+                node, failure_type, severity, edge[<span class="str">"latency_ms"</span>]
+            )
+            <span class="cm"># check retry storm amplification</span>
+            total_time = effective_latency * caller[<span class="str">"retry_count"</span>]
+
+            <span class="kw">if</span> total_time > caller[<span class="str">"timeout_ms"</span>]:
+                <span class="kw">if</span> caller[<span class="str">"circuit_breaker"</span>]:
+                    status = <span class="fn">evaluate_circuit_breaker</span>(caller)
+                <span class="kw">else</span>:
+                    status = <span class="str">"DEAD"</span>
+                t += total_time / 1000  <span class="cm"># convert to seconds</span>
+                timeline.append({<span class="str">"node"</span>: caller, <span class="str">"status"</span>: status, <span class="str">"t"</span>: t})
+                <span class="kw">if</span> status == <span class="str">"DEAD"</span>:
+                    queue.append(caller)
+
+    <span class="kw">return</span> timeline</pre>
+
+    <h3 style="margin-top:28px;margin-bottom:16px">Circuit Breaker State Machine</h3>
+    <div class="cb-states">
+      <div class="cb-state closed">
+        <h4>CLOSED ✓</h4>
+        <p>Normal operation. Calls flow through. Failure rate tracked in rolling window.</p>
+      </div>
+      <div class="cb-state open">
+        <h4>OPEN ✗</h4>
+        <p>Threshold exceeded. All calls fail-fast. No requests to downstream. Timer starts.</p>
+      </div>
+      <div class="cb-state half">
+        <h4>HALF-OPEN ◑</h4>
+        <p>Trial probe sent. If success → CLOSED. If fail → OPEN again. Recovery path.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;margin-bottom:12px">Retry Storm Logic</h3>
+    <p>This is the most dangerous and least understood failure mode. When a service is slow (not dead), callers retry. Each retry adds load. More load → more slowness → more retries. Exponential explosion.</p>
+    <pre><span class="cm"># Retry storm amplification factor</span>
+amplification = retry_count ** concurrent_callers
+<span class="cm"># e.g. 3 retries × 10 caller instances = 30x load spike
+# If original service handled 100 rps, now it sees 3000 rps
+# This is why delays are more dangerous than crashes</span></pre>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SYSTEM 4: BLAST RADIUS REPORT -->
+  <div class="section">
+    <div class="tag purple">System 4</div>
+    <h2>Blast Radius AI Report</h2>
+    <p>After simulation, the structured output (timeline, affected nodes, user impact %) is sent to Gemini with a system prompt + tool definitions. Gemini generates a plain-English incident report.</p>
+    <div class="grid grid-2" style="margin:24px 0">
+      <div class="card">
+        <h3>Gemini Tool Schema</h3>
+        <pre style="margin:0;font-size:.78rem"><span class="fn">generate_blast_report</span>({
+  <span class="str">affected_services</span>: string[],
+  <span class="str">faultline_timeline_s</span>: number[],
+  <span class="str">user_impact_pct</span>: number,
+  <span class="str">recovery_estimate_s</span>: number,
+  <span class="str">root_cause</span>: string,
+  <span class="str">contributing_factors</span>: string[]
+})</pre>
+      </div>
+      <div class="card">
+        <h3>Sample Output</h3>
+        <p style="font-size:.85rem;font-style:italic;color:var(--text)">"Your Payment API failure faultlines to the Orders Service in 4.2s via retry storm. The Auth Service circuit breaker trips at 8s, protecting 32% of users. Full outage affects 68% of sessions. Estimated manual recovery: 8–14 minutes."</p>
+      </div>
+    </div>
+    <div class="insight">
+      <strong>Why tool-calling matters:</strong> Using Gemini's function calling (not free-text) guarantees structured, typed output. The report is generated from real simulation data — not hallucinated. This is the correct way to use LLMs in engineering systems.
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SYSTEM 5: OBSERVABILITY -->
+  <div class="section">
+    <div class="tag green">System 5</div>
+    <h2>Observability Dashboard</h2>
+    <p>A live metrics panel that updates as the simulation runs, making Faultline feel like a real monitoring tool — not a toy.</p>
+    <div class="metric-row">
+      <div class="metric red"><div class="val">2/7</div><div class="lbl">Services Healthy</div></div>
+      <div class="metric yellow"><div class="val">847ms</div><div class="lbl">P99 Latency</div></div>
+      <div class="metric red"><div class="val">68%</div><div class="lbl">Error Rate</div></div>
+      <div class="metric cyan"><div class="val">8min</div><div class="lbl">Est. Recovery</div></div>
+    </div>
+    <div class="grid grid-2" style="margin-top:20px">
+      <div class="card">
+        <h3>Metrics Tracked Per Service</h3>
+        <ul>
+          <li>Health score (0.0 – 1.0)</li>
+          <li>Latency P50, P95, P99</li>
+          <li>Error rate (4xx + 5xx %)</li>
+          <li>Request rate (rps)</li>
+          <li>Circuit breaker state</li>
+          <li>Retry count per window</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Visualization Components</h3>
+        <ul>
+          <li>Real-time latency line graph (Recharts)</li>
+          <li>Error rate bar chart</li>
+          <li>Service health heatmap</li>
+          <li>Faultline propagation timeline</li>
+          <li>Affected user percentage gauge</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- CONCEPTS -->
+  <div class="section">
+    <div class="tag cyan">Concepts You Master</div>
+    <h2>The real distributed systems knowledge</h2>
+    <table>
+      <thead><tr><th>Concept</th><th>Where It Appears</th><th>Interview Relevance</th></tr></thead>
+      <tbody>
+        <tr><td>CAP Theorem</td><td>Node failure forces consistency vs availability trade-off in sim</td><td>Every distributed systems interview</td></tr>
+        <tr><td>Circuit Breaker</td><td>Full 3-state machine implementation in engine</td><td>System design — Netflix Hystrix, Resilience4j</td></tr>
+        <tr><td>Retry Storms</td><td>Amplification factor computed per edge</td><td>Explains most real-world outages</td></tr>
+        <tr><td>Timeout Chains</td><td>Propagated latency budget calculation</td><td>gRPC deadline propagation design</td></tr>
+        <tr><td>Graph Traversal</td><td>BFS from failure seed, topological eval order</td><td>Algorithm interviews + system design</td></tr>
+        <tr><td>Observability (3 pillars)</td><td>Metrics + simulated logs + trace timeline</td><td>SRE role at any company</td></tr>
+        <tr><td>LLM Tool Calling</td><td>Gemini structured function calling for reports</td><td>ML/AI engineering roles</td></tr>
+        <tr><td>Service Mesh Concepts</td><td>Sidecar proxy model, traffic policies</td><td>Kubernetes + Istio discussions</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- ARCHITECTURE OVERVIEW -->
+  <div class="section">
+    <div class="tag purple">Architecture</div>
+    <h2>System architecture overview</h2>
+    <div class="arch-flow" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div style="display:flex;align-items:center;gap:12px"><div class="node purple">React Frontend</div><span style="color:var(--muted);font-size:.85rem">← React Flow canvas, config panels, metrics dashboard</span></div>
+      <div style="padding-left:20px;color:var(--muted)">↕ REST API (FastAPI)</div>
+      <div style="display:flex;align-items:center;gap:12px"><div class="node yellow">Simulation Engine</div><span style="color:var(--muted);font-size:.85rem">← Python, NetworkX, BFS propagation, circuit breaker FSM</span></div>
+      <div style="padding-left:20px;color:var(--muted)">↓</div>
+      <div style="display:flex;align-items:center;gap:12px"><div class="node cyan">Gemini API</div><span style="color:var(--muted);font-size:.85rem">← Tool-calling for structured blast radius report</span></div>
+      <div style="padding-left:20px;color:var(--muted)">↓</div>
+      <div style="display:flex;align-items:center;gap:12px"><div class="node green">Report + Metrics</div><span style="color:var(--muted);font-size:.85rem">← Returned to frontend, rendered in observability panel</span></div>
+    </div>
+  </div>
+
+</div>
+
+<div style="background:var(--surface);border-top:1px solid var(--border);padding:40px;text-align:center">
+  <p style="font-size:.9rem">Faultline · Distributed System Failure Simulator · Built by Devansh Kumar</p>
+</div>
+
+</body>
+</html>
